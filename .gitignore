@@ -1,0 +1,22 @@
+# environments
+.venv/
+venv/
+.env
+
+# local audio, downloads, and pipeline outputs — never commit (copyright / size)
+data/
+outputs/
+*.wav
+*.aiff
+*.mp3
+*.m4a
+*.mp4
+*.opus
+
+# python
+__pycache__/
+*.pyc
+*.egg-info/
+
+# os
+.DS_Store
