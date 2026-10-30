@@ -4,12 +4,14 @@ D&D actual-play audio → **timestamped transcript labeled with which player is 
 CS6352 project (Bradshaw, Walton, Jackson). This is the proof of concept: pretrained models
 only, no training. See [`docs/plan.md`](docs/plan.md) for the design.
 
-Pipeline: `preprocess → diarize → ASR → merge → (optional) enrollment → evaluate`
+Pipeline: `preprocess → ASR → diarize → merge → (optional) enrollment → evaluate`
 
+- **ASR** — OpenAI Whisper produces the text, with per-word timestamps. (It runs before
+  diarization on purpose — see the note in `pipeline.py`.)
 - **Diarization** — pyannote `speaker-diarization-3.1` answers *who spoke when* as anonymous
   clusters (`SPEAKER_00`, `SPEAKER_01`, …).
-- **ASR** — OpenAI Whisper produces the text.
-- **Merge** — each transcript segment gets the cluster it overlaps most in time.
+- **Merge** — each word gets the cluster it overlaps most in time, and lines are split where
+  the speaker changes.
 - **Enrollment (optional)** — renames clusters to real players by cosine-matching each cluster
   against a short voice sample per player; below `unknown_threshold` it says `unknown`.
 
@@ -53,6 +55,13 @@ bash scripts/fetch_clip.sh "https://www.youtube.com/watch?v=XXXX" 00:30:00 00:02
 Outputs go to `outputs/`: `<name>.transcript.json` (full schema), `<name>.srt` (readable),
 `<name>.rttm` (for scoring). Whisper sizes: `base`/`small` are fine on CPU; `large-v3` wants a GPU.
 
+Options:
+- `--drop-silence` — remove lines that are mostly silence (often Whisper inventing text). Off by
+  default because it also removes real speech the diarizer missed. Lines with no detected
+  speech are otherwise kept and labeled `unknown`.
+- `--min-speakers N` — a floor on the speaker count. Unlike `--num-speakers` it doesn't force an
+  exact count, which made results worse on AMI.
+
 ## Evaluate
 
 Score a run against hand-labeled ground truth (format in [`docs/gold-labels.md`](docs/gold-labels.md)):
@@ -73,15 +82,21 @@ diarization. Run `bash scripts/fetch_ami.sh` first, then from the repo root:
 | `python -m experiments.ami_compare` | Does forcing the speaker count help? | No — 19.4% DER auto vs 39.9% forced |
 | `python -m experiments.overlap_eval` | How much error is overlapping speech? | ~8 points: 19.4% → 11.3% without overlap |
 | `python -m experiments.vad_tuning` | Can tuning cut missed speech? | No — misses stuck at ~11% in every config |
+| `python -m experiments.ami_identify` | Does identifying roster players directly beat clustering? | No — 20.4% vs 19.4% DER; a quiet speaker talking over others is still missed |
 
-(Use `.venv/bin/python`. `ami_compare` and `vad_tuning` take ~20 min on CPU.)
+(Use `.venv/bin/python`. `ami_compare` and `vad_tuning` take ~20 min on CPU; `ami_identify` ~2 min.)
+
+`dnd_notetaker/identify.py` is that experimental alternative to clustering: it labels each
+1.5s window with the closest enrolled player (and allows several voice samples per player, e.g.
+a character voice). It isn't wired into the CLI yet — we'll evaluate it on D&D audio first.
 
 ## Layout
 
 ```
-dnd_notetaker/   pipeline package (preprocess, diarize, asr, merge, enroll, evaluate, cli, hf)
+dnd_notetaker/   pipeline package (preprocess, asr, diarize, merge, enroll, evaluate, cli, hf;
+                 identify = experimental)
 experiments/     one-off AMI experiments, each documents its own result
-scripts/         sample audio, YouTube clip fetch, AMI download
+scripts/         sample audio, YouTube clip fetch, AMI download (+ ES2004b for enrollment)
 config/          roster files (player names + enrollment wavs)
 docs/            plan, gold-label format
 data/, outputs/  local only — gitignored, never commit audio

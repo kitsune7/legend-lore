@@ -24,6 +24,11 @@ def main() -> None:
     ap.add_argument("--roster", default=None,
                     help="roster JSON with player enrollment wavs (enables name matching)")
     ap.add_argument("--language", default=None, help="force a language code, e.g. en")
+    ap.add_argument("--min-speakers", type=int, default=None,
+                    help="lower bound on speaker count (unlike --num-speakers, doesn't force it)")
+    ap.add_argument("--drop-silence", action="store_true",
+                    help="drop lines mostly over silence (cuts Whisper hallucinations, "
+                         "but also drops speech the diarizer missed)")
     args = ap.parse_args()
 
     roster = None
@@ -37,6 +42,8 @@ def main() -> None:
         num_speakers=args.num_speakers,
         roster=roster,
         language=args.language,
+        drop_silence=args.drop_silence,
+        min_speakers=args.min_speakers,
     )
 
 

@@ -26,11 +26,14 @@ def diarize(
     wav_16k: str | Path,
     num_speakers: int | None = None,
     rttm_out: str | Path | None = None,
+    min_speakers: int | None = None,
 ) -> list[DiarSegment]:
     """Run pyannote diarization and optionally write an RTTM.
 
     `num_speakers` forces the cluster count. On AMI this made DER worse
     (19.4% -> 39.9%), so leave it unset unless you have measured it helps.
+    `min_speakers` only sets a floor, so it can recover a quiet speaker that
+    would otherwise be merged into a louder one without forcing an exact count.
     """
     wav_16k = Path(wav_16k)
 
@@ -49,7 +52,8 @@ def diarize(
         return segs
 
     pipe = hf.load_pipeline()
-    kwargs = {"num_speakers": num_speakers} if num_speakers else {}
+    kwargs = {k: v for k, v in {"num_speakers": num_speakers,
+                                "min_speakers": min_speakers}.items() if v}
     annotation = pipe(str(wav_16k), **kwargs)
 
     segs = sorted(
