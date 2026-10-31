@@ -9,7 +9,7 @@ Compares against the clustering run saved by ami_compare.py on:
     (for clustering: via the cluster that overlaps them most)
 
 Prereq: bash scripts/fetch_ami.sh ; experiments/ami_compare.py (baseline RTTM)
-Run:    .venv/bin/python -m experiments.ami_identify      (~2 min on CPU)
+Run:    uv run python -m experiments.ami_identify      (~2 min on CPU)
 """
 from __future__ import annotations
 

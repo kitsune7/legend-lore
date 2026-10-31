@@ -6,7 +6,7 @@ Sweeps pyannote 3.1 knobs on the 5-min AMI slice, loading the model once.
   clustering.min_cluster_size    — lower = keep small clusters
 
 Prereq: bash scripts/fetch_ami.sh
-Run:    .venv/bin/python -m experiments.vad_tuning      (~3 min per config on CPU)
+Run:    uv run python -m experiments.vad_tuning      (~3 min per config on CPU)
 
 Result (2026-10-22): missed detection stuck at ~11% in every config (3.1's
 segmentation model is fixed; only clustering is tunable). No config beat the

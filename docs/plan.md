@@ -196,7 +196,7 @@ That's enough for an MVP. No baselines-grid, no corpus-scale scoring.
 
 **Install** (GPU box with CUDA; CPU works with Whisper `small`):
 ```bash
-pip install openai-whisper pyannote.audio pyannote.metrics jiwer soundfile ffmpeg-python
+uv sync --locked
 # ffmpeg must be on PATH (brew install ffmpeg / apt install ffmpeg)
 # Get a free Hugging Face token, then accept terms on the model pages:
 #   huggingface.co/pyannote/speaker-diarization-3.1  and  .../pyannote/embedding

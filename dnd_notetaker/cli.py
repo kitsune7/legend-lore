@@ -1,8 +1,8 @@
 """CLI: audio -> player-attributed transcript.
 
 Examples:
-  .venv/bin/python -m dnd_notetaker.cli --audio data/session.m4a --out outputs --model small
-  .venv/bin/python -m dnd_notetaker.cli --audio data/session.wav --roster config/roster.sample.json
+  uv run python -m dnd_notetaker.cli --audio data/session.m4a --out outputs --model small
+  uv run python -m dnd_notetaker.cli --audio data/session.wav --roster config/roster.sample.json
 """
 from __future__ import annotations
 

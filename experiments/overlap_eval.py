@@ -4,7 +4,7 @@ Re-scores the saved full-file diarization (no re-diarization) with and without
 overlapped regions and a boundary collar.
 
 Prereq: experiments/ami_compare.py (writes outputs/ES2004a_full_auto.rttm)
-Run:    .venv/bin/python -m experiments.overlap_eval      (seconds)
+Run:    uv run python -m experiments.overlap_eval      (seconds)
 
 Result (2026-10-22): 15.8% of speech is overlapped. DER 19.4% strict ->
 11.3% skipping overlap -> 8.4% with collar=0.25 + skip_overlap.

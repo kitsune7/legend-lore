@@ -16,10 +16,10 @@ NAME="${4:-clip}"
 mkdir -p data
 
 # player_client override avoids YouTube's SABR-streaming block (web client fails).
-PY=".venv/bin/python -m yt_dlp --extractor-args youtube:player_client=ios,android,tv"
+PY="uv run --locked python -m yt_dlp --extractor-args youtube:player_client=ios,android,tv"
 
 # Compute the end time for --download-sections (accepts seconds or hh:mm:ss).
-END=$(.venv/bin/python - "$START" "$DUR" <<'PY'
+END=$(uv run --locked python - "$START" "$DUR" <<'PY'
 import sys
 def sec(t):
     if ":" in t:
@@ -30,7 +30,7 @@ def sec(t):
 print(f"{sec(sys.argv[1])+sec(sys.argv[2]):.0f}")
 PY
 )
-START_S=$(.venv/bin/python - "$START" <<'PY'
+START_S=$(uv run --locked python - "$START" <<'PY'
 import sys
 t=sys.argv[1]
 if ":" in t:

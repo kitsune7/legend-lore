@@ -1,7 +1,7 @@
 """Experiment 1 — full AMI ES2004a file, with and without a forced speaker count.
 
 Prereq: bash scripts/fetch_ami.sh
-Run:    .venv/bin/python -m experiments.ami_compare      (~12 min each pass on CPU)
+Run:    uv run python -m experiments.ami_compare      (~12 min each pass on CPU)
 
 Result (2026-10-22): auto 19.4% DER (5 clusters) vs num_speakers=4 39.9% DER —
 forcing the count blew confusion up from 3.7% to 24.3%.

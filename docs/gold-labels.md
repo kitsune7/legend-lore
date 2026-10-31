@@ -34,7 +34,7 @@ SPEAKER cr_clip_16k 1 4.20 3.10 <NA> <NA> Laura <NA> <NA>
 
 ## Score it
 ```bash
-.venv/bin/python -m dnd_notetaker.evaluate \
+uv run python -m dnd_notetaker.evaluate \
   --pred-rttm outputs/cr_clip.rttm \
   --gold-rttm data/gold/cr_clip.gold.rttm \
   --pred-json outputs/cr_clip.transcript.json \
