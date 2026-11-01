@@ -67,8 +67,18 @@ uv run python -m dnd_notetaker.cli --audio data/sample_session.wav --model base 
     --roster config/roster.sample.json
 
 # a real actual-play clip: <url> <start> <duration> <name>
+# this grabs the full audio and then runs the transcription and diarization
 bash scripts/fetch_clip.sh "https://www.youtube.com/watch?v=XXXX" 00:30:00 00:02:00 cr_clip
 uv run python -m dnd_notetaker.cli --audio data/cr_clip.wav --model base
+```
+
+`--audio` also accepts a single-video YouTube URL (`watch?v=`, `youtu.be/`, `/shorts/`,
+`/live/`, `/embed/`). The audio is streamed through yt-dlp into ffmpeg and written as
+`outputs/<video_id>_16k.wav` (about 115 MB per hour); outputs are named by video ID.
+Each run re-downloads. Playlists, in-progress live streams and premieres are rejected.
+
+```bash
+uv run python -m dnd_notetaker.cli --audio "https://youtu.be/XXXXXXXXXXX" --model base
 ```
 
 Outputs go to `outputs/`: `<name>.transcript.json` (full schema), `<name>.srt` (readable),

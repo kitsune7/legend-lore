@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from . import asr, diarize, enroll, merge, preprocess
+from . import asr, diarize, enroll, merge, preprocess, youtube
 
 
 def _fmt_ts(t: float) -> str:
@@ -32,10 +32,21 @@ def run(
 ) -> dict:
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    stem = Path(audio).stem
-
-    print("[1/5] preprocess -> 16kHz mono")
-    wav = preprocess.to_16k_mono(audio, out_dir / f"{stem}_16k.wav")
+    src = str(audio)
+    vid = youtube.video_id(src)
+    if vid:
+        stem = vid
+        print("[1/5] fetch YouTube audio -> 16kHz mono (streaming)")
+        wav = youtube.stream_to_16k_mono(src, out_dir / f"{stem}_16k.wav")
+    elif youtube.is_youtube_host(src):
+        raise ValueError(
+            f"unsupported YouTube URL (need a single video: watch?v=, youtu.be/, "
+            f"/shorts/, /live/, /embed/): {src}"
+        )
+    else:
+        stem = Path(audio).stem
+        print("[1/5] preprocess -> 16kHz mono")
+        wav = preprocess.to_16k_mono(audio, out_dir / f"{stem}_16k.wav")
 
     # ASR runs before diarization on purpose: Whisper's word timestamps compile a
     # numba kernel on first use, and that compile crashes if pyannote has already
